@@ -1,0 +1,556 @@
+<h1>bja49</h1>
+
+<h2>Commits</h2>
+
+<pre style="background: white; font-family: monospace;">
+$ git log --oneline
+<span style="color:rgb(154,153,47)">bb21a79</span><span style="color:rgb(154,153,47)"> (</span><span style="font-weight: bold; color:rgb(101, 216, 218)">HEAD -&gt; </span><span style="font-weight: bold; color:rgb(74,163,47)">master</span><span style="color:rgb(154,153,47)">, </span><span style="font-weight: bold; color:rgb(140,26,17)">origin/master</span><span style="color:rgb(154,153,47)">, </span><span style="font-weight: bold; color:rgb(140,26,17)">origin/HEAD</span><span style="color:rgb(154,153,47)">)</span> Extract average calculation from output.
+<span style="color:rgb(154,153,47)">c39999c</span> Separate calculation of average and max.
+<span style="color:rgb(154,153,47)">f268970</span> Replace explicit type with auto
+<span style="color:rgb(154,153,47)">ca0dc89</span> Rename varible m to max.
+<span style="color:rgb(154,153,47)">8946939</span> Rename variable t to total.
+<span style="color:rgb(154,153,47)">5e85ba8</span> Move variable declarations closer to their initial uses.
+<span style="color:rgb(154,153,47)">674b2cc</span> Fix crash with empty rainfall data.
+<span style="color:rgb(154,153,47)">1041d90</span> Replace instances of float with double.
+<span style="color:rgb(154,153,47)">2924838</span> Add comment to each section of code.
+<span style="color:rgb(154,153,47)">afa077a</span> Add return statement to main function.
+<span style="color:rgb(154,153,47)">06b003d</span> Remove namespace std.
+<span style="color:rgb(154,153,47)">44a522e</span> Add header comment.
+<span style="color:rgb(154,153,47)">b9ba174</span> Initial commit
+</pre>
+<h2>Compare</h2>
+
+<pre style="background: white; font-family: monospace;">
+$ diff ../oracle/rainfall.cpp rainfall.cpp
+2,5c2,5
+&lt;     rainfall.cpp
+&lt; 
+&lt;     Rainfall report. Individual rain amounts per hour are input. Output is the average
+&lt;     and heaviest hourly rainfall.
+---
+&gt; 	rainfall.cpp
+&gt; 	
+&gt; 	Rainfall report. Individual rain amounts per day are input.
+&gt; 	Output is the average and heaviest hourly rainfall.
+7d6
+&lt; 
+12d10
+&lt; int main() {
+14c12,14
+&lt;     // input hourly rainfall data
+---
+&gt; int main() {
+&gt; 	
+&gt; 	// Input hourly rainfall rate
+20,23c20,23
+&lt;     if (!rainfall.size())
+&lt;         return 1;
+&lt; 
+&lt;     // calculate average rainfall
+---
+&gt; 	if (!rainfall.size())
+&gt; 		return 1;
+&gt; 	
+&gt; 	// Calculate average rainfall
+28,30c28,30
+&lt;     auto average = total / rainfall.size();
+&lt; 
+&lt;     // calculate heaviest rainfall
+---
+&gt; 	auto average = total / rainfall.size();
+&gt; 	
+&gt; 	// Calculate heaviest rainfall
+36,37c36,37
+&lt; 
+&lt;     // output the rainfall report
+---
+&gt; 	
+&gt; 	// Output the rainfall report
+40,41c40,41
+&lt; 
+&lt;     return 0;
+---
+&gt; 	
+&gt; 	return 0;
+</pre>
+<h2>Build/Test</h2>
+
+<pre style="background: white; font-family: monospace;">
+
+$ git checkout -q bb21a792f562110114162cacd0b9a210e2c71a64
+$ git show --color
+<span style="color:rgb(154,153,47)">commit bb21a792f562110114162cacd0b9a210e2c71a64</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:29:58 2021 -0500
+
+    Extract average calculation from output.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 4bebf4e..6f3389a 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -25,6 +25,7 @@</span> int main() {
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+         total += rainfall[i];
+     }
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">auto average = total / rainfall.size();</span>
+ 	
+ 	// Calculate heaviest rainfall
+     auto max = rainfall[0];
+<span style="color:rgb(101, 216, 218)">@@ -34,7 +35,7 @@</span> int main() {
+     }
+ 	
+ 	// Output the rainfall report
+<span style="color:rgb(140,26,17)">-    std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (total / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; average &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+     std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; max &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+ 	
+ 	return 0;
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q c39999c6b24269d1cec063c2f94d64d1792c7ea5
+$ git show --color
+<span style="color:rgb(154,153,47)">commit c39999c6b24269d1cec063c2f94d64d1792c7ea5</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:27:45 2021 -0500
+
+    Separate calculation of average and max.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index e7a9c99..4bebf4e 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -20,11 +20,15 @@</span> int main() {
+ 	if (!rainfall.size())
+ 		return 1;
+ 	
+<span style="color:rgb(140,26,17)">-	// Calculate average and heaviest rainfall</span>
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">// Calculate average rainfall</span>
+     auto total = rainfall[0];
+<span style="color:rgb(140,26,17)">-    auto max = rainfall[0];</span>
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+         total += rainfall[i];
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    }</span>
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">// Calculate heaviest rainfall</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    auto max = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    for (int i = 1; i &lt; rainfall.size(); ++i) {</span>
+         if (rainfall[i] &gt; max)
+             max = rainfall[i];
+     }
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q f26897008abaf94d5132c644208de0dcf74d8ff2
+$ git show --color
+<span style="color:rgb(154,153,47)">commit f26897008abaf94d5132c644208de0dcf74d8ff2</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:24:24 2021 -0500
+
+    Replace explicit type with auto
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 09c8ef4..e7a9c99 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -21,8 +21,8 @@</span> int main() {
+ 		return 1;
+ 	
+ 	// Calculate average and heaviest rainfall
+<span style="color:rgb(140,26,17)">-    double total = rainfall[0];</span>
+<span style="color:rgb(140,26,17)">-    double max = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    auto total = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    auto max = rainfall[0];</span>
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+         total += rainfall[i];
+         if (rainfall[i] &gt; max)
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q ca0dc899ea4e98e97425de4c603407ffd2edc9a8
+$ git show --color
+<span style="color:rgb(154,153,47)">commit ca0dc899ea4e98e97425de4c603407ffd2edc9a8</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:23:21 2021 -0500
+
+    Rename varible m to max.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 7ed6b5f..09c8ef4 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -22,16 +22,16 @@</span> int main() {
+ 	
+ 	// Calculate average and heaviest rainfall
+     double total = rainfall[0];
+<span style="color:rgb(140,26,17)">-    double m = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double max = rainfall[0];</span>
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+         total += rainfall[i];
+<span style="color:rgb(140,26,17)">-        if (rainfall[i] &gt; m)</span>
+<span style="color:rgb(140,26,17)">-            m = rainfall[i];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">        if (rainfall[i] &gt; max)</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">            max = rainfall[i];</span>
+     }
+ 	
+ 	// Output the rainfall report
+     std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (total / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+<span style="color:rgb(140,26,17)">-    std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; max &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+ 	
+ 	return 0;
+ }
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 8946939e03d678eaedd2e8ae8415563bf1c35e4c
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 8946939e03d678eaedd2e8ae8415563bf1c35e4c</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:22:26 2021 -0500
+
+    Rename variable t to total.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index b605380..7ed6b5f 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -21,16 +21,16 @@</span> int main() {
+ 		return 1;
+ 	
+ 	// Calculate average and heaviest rainfall
+<span style="color:rgb(140,26,17)">-    double t = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double total = rainfall[0];</span>
+     double m = rainfall[0];
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+<span style="color:rgb(140,26,17)">-        t += rainfall[i];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">        total += rainfall[i];</span>
+         if (rainfall[i] &gt; m)
+             m = rainfall[i];
+     }
+ 	
+ 	// Output the rainfall report
+<span style="color:rgb(140,26,17)">-    std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (t / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (total / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+     std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+ 	
+ 	return 0;
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 5e85ba8e649b320742287e50b2ef54835a16d773
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 5e85ba8e649b320742287e50b2ef54835a16d773</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:20:37 2021 -0500
+
+    Move variable declarations closer to their initial uses.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 25a5bb9..b605380 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -13,8 +13,6 @@</span> int main() {
+ 	
+ 	// Input hourly rainfall rate
+     std::vector&lt;double&gt; rainfall;
+<span style="color:rgb(140,26,17)">-    double t;</span>
+<span style="color:rgb(140,26,17)">-    double m;</span>
+     double n;
+     while (std::cin &gt;&gt; n) {
+         rainfall.push_back(n);
+<span style="color:rgb(101, 216, 218)">@@ -23,8 +21,8 @@</span> int main() {
+ 		return 1;
+ 	
+ 	// Calculate average and heaviest rainfall
+<span style="color:rgb(140,26,17)">-    t = rainfall[0];</span>
+<span style="color:rgb(140,26,17)">-    m = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double t = rainfall[0];</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double m = rainfall[0];</span>
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+         t += rainfall[i];
+         if (rainfall[i] &gt; m)
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 674b2cc91b8bed7ff9e4057681b1c4ed0ed66771
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 674b2cc91b8bed7ff9e4057681b1c4ed0ed66771</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:18:42 2021 -0500
+
+    Fix crash with empty rainfall data.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 832922a..25a5bb9 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -19,6 +19,8 @@</span> int main() {
+     while (std::cin &gt;&gt; n) {
+         rainfall.push_back(n);
+     }
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">if (!rainfall.size())</span>
+<span style="color:rgb(74,163,47)">+</span>		<span style="color:rgb(74,163,47)">return 1;</span>
+ 	
+ 	// Calculate average and heaviest rainfall
+     t = rainfall[0];
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 1041d90fec27340c21ba5577a278bebc1b0f78c3
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 1041d90fec27340c21ba5577a278bebc1b0f78c3</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:17:00 2021 -0500
+
+    Replace instances of float with double.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index c460bcc..832922a 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -12,10 +12,10 @@</span>
+ int main() {
+ 	
+ 	// Input hourly rainfall rate
+<span style="color:rgb(140,26,17)">-    std::vector&lt;float&gt; rainfall;</span>
+<span style="color:rgb(140,26,17)">-    float t;</span>
+<span style="color:rgb(140,26,17)">-    float m;</span>
+<span style="color:rgb(140,26,17)">-    float n;</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::vector&lt;double&gt; rainfall;</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double t;</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double m;</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    double n;</span>
+     while (std::cin &gt;&gt; n) {
+         rainfall.push_back(n);
+     }
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 2924838387ad2a6a9de667201df4299343cee644
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 2924838387ad2a6a9de667201df4299343cee644</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:14:01 2021 -0500
+
+    Add comment to each section of code.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 6085e13..c460bcc 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -10,6 +10,8 @@</span>
+ 
+ 
+ int main() {
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">// Input hourly rainfall rate</span>
+     std::vector&lt;float&gt; rainfall;
+     float t;
+     float m;
+<span style="color:rgb(101, 216, 218)">@@ -17,6 +19,8 @@</span> int main() {
+     while (std::cin &gt;&gt; n) {
+         rainfall.push_back(n);
+     }
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">// Calculate average and heaviest rainfall</span>
+     t = rainfall[0];
+     m = rainfall[0];
+     for (int i = 1; i &lt; rainfall.size(); ++i) {
+<span style="color:rgb(101, 216, 218)">@@ -24,6 +28,8 @@</span> int main() {
+         if (rainfall[i] &gt; m)
+             m = rainfall[i];
+     }
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">// Output the rainfall report</span>
+     std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (t / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+     std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+ 	
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q afa077ac36836698d158628310b7cfd00b0e0013
+$ git show --color
+<span style="color:rgb(154,153,47)">commit afa077ac36836698d158628310b7cfd00b0e0013</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:12:07 2021 -0500
+
+    Add return statement to main function.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index e9c0b68..6085e13 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -26,4 +26,6 @@</span> int main() {
+     }
+     std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (t / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+     std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">return 0;</span>
+ }
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 06b003d7fb635b1c2ca2ef70e85003d57970f970
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 06b003d7fb635b1c2ca2ef70e85003d57970f970</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:06:57 2021 -0500
+
+    Remove namespace std.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index 11e2bdb..e9c0b68 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -8,14 +8,13 @@</span>
+ #include &lt;iomanip&gt;
+ #include &lt;vector&gt;
+ 
+<span style="color:rgb(140,26,17)">-using namespace std;</span>
+ 
+ int main() {
+<span style="color:rgb(140,26,17)">-    vector&lt;float&gt; rainfall;</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::vector&lt;float&gt; rainfall;</span>
+     float t;
+     float m;
+     float n;
+<span style="color:rgb(140,26,17)">-    while (cin &gt;&gt; n) {</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    while (std::cin &gt;&gt; n) {</span>
+         rainfall.push_back(n);
+     }
+     t = rainfall[0];
+<span style="color:rgb(101, 216, 218)">@@ -25,6 +24,6 @@</span> int main() {
+         if (rainfall[i] &gt; m)
+             m = rainfall[i];
+     }
+<span style="color:rgb(140,26,17)">-    cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (t / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(140,26,17)">-    cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::cout &lt;&lt; "Average Hourly Rainfall: " &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; (t / rainfall.size()) &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">    std::cout &lt;&lt; "Heaviest Hourly Rainfall: " &lt;&lt; m &lt;&lt; " hundreds of inches" &lt;&lt; '\n';</span>
+ }
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+
+$ git checkout -q 44a522e5a55f3fa99913e6d981295acc580e42fb
+$ git show --color
+<span style="color:rgb(154,153,47)">commit 44a522e5a55f3fa99913e6d981295acc580e42fb</span>
+Author: Bryce Allen &lt;bja49@zips.uakron.edu&gt;
+Date:   Fri Jan 15 04:02:24 2021 -0500
+
+    Add header comment.
+
+<span style="font-weight: bold; ">diff --git a/rainfall.cpp b/rainfall.cpp</span>
+<span style="font-weight: bold; ">index e488150..11e2bdb 100644</span>
+<span style="font-weight: bold; ">--- a/rainfall.cpp</span>
+<span style="font-weight: bold; ">+++ b/rainfall.cpp</span>
+<span style="color:rgb(101, 216, 218)">@@ -1,3 +1,9 @@</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">/*</span>
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">rainfall.cpp</span>
+<span style="color:rgb(74,163,47)">+</span><span style="">1m	
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">Rainfall report. Individual rain amounts per day are input.</span>
+<span style="color:rgb(74,163,47)">+</span>	<span style="color:rgb(74,163,47)">Output is the average and heaviest hourly rainfall.</span>
+<span style="color:rgb(74,163,47)">+</span><span style="color:rgb(74,163,47)">*/</span>
+ #include &lt;iostream&gt;
+ #include &lt;iomanip&gt;
+ #include &lt;vector&gt;
+g++ -std=c++17 -Wall -c rainfall.cpp
+g++ -std=c++17 -Wall rainfall.o -o rainfall
+$ make run
+./rainfall &lt; rainfall.csv
+Average Hourly Rainfall: 0.04 hundreds of inches
+Heaviest Hourly Rainfall: 1.04 hundreds of inches
+$ make test
+./rainfall &lt; rainfall.csv &gt; testrun.txt
+diff report.txt testrun.txt
+$ make clean
+</pre>
